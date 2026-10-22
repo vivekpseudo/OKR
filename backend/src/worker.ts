@@ -4,8 +4,8 @@ import {env} from './config.js';
 import {sendNotificationEvent} from './notifications.js';
 import {sendWorkspaceIntegrationMessages} from './integrations.js';
 
-type DueUser={user_id:string;organization_id:string;email:string;name:string};
-type DueOrganization={organization_id:string;name:string};
+type DueUser={user_id:string;organization_id:string;email:string;name:string;[column:string]:any};
+type DueOrganization={organization_id:string;name:string;[column:string]:any};
 const periodKey=()=>{const d=new Date();d.setUTCDate(d.getUTCDate()-((d.getUTCDay()+6)%7));return d.toISOString().slice(0,10);};
 
 async function claimReminder(table:'reminder_deliveries'|'workspace_reminder_deliveries', orgId:string, userId:string|null, type:string, period:string) {
