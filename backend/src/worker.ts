@@ -6,15 +6,15 @@ import {sendWorkspaceIntegrationMessages} from './integrations.js';
 
 type DueUser={user_id:string;organization_id:string;email:string;name:string};
 type DueOrganization={organization_id:string;name:string};
-const periodKey=()=>new Date().toISOString().slice(0,10);
+const periodKey=()=>{const d=new Date();d.setUTCDate(d.getUTCDate()-((d.getUTCDay()+6)%7));return d.toISOString().slice(0,10);};
 
 async function claimReminder(table:'reminder_deliveries'|'workspace_reminder_deliveries', orgId:string, userId:string|null, type:string, period:string) {
  if(table==='reminder_deliveries') return query(
-  "INSERT INTO reminder_deliveries(organization_id,user_id,reminder_type,period_key,status) VALUES($1,$2,$3,$4,'queued') ON CONFLICT(user_id,reminder_type,period_key) DO UPDATE SET status='queued',last_error=NULL,created_at=now() WHERE reminder_deliveries.status='failed' RETURNING id",
+  "INSERT INTO reminder_deliveries(organization_id,user_id,reminder_type,period_key,status) VALUES($1,$2,$3,$4,'queued') ON CONFLICT(user_id,reminder_type,period_key) DO UPDATE SET status='queued',last_error=NULL,created_at=now() WHERE reminder_deliveries.status='failed' OR (reminder_deliveries.status='queued' AND reminder_deliveries.created_at < now()-interval '10 minutes') RETURNING id",
   [orgId,userId,type,period]
  );
  return query(
-  "INSERT INTO workspace_reminder_deliveries(organization_id,reminder_type,period_key,status) VALUES($1,$2,$3,'queued') ON CONFLICT(organization_id,reminder_type,period_key) DO UPDATE SET status='queued',last_error=NULL,created_at=now() WHERE workspace_reminder_deliveries.status='failed' RETURNING id",
+  "INSERT INTO workspace_reminder_deliveries(organization_id,reminder_type,period_key,status) VALUES($1,$2,$3,'queued') ON CONFLICT(organization_id,reminder_type,period_key) DO UPDATE SET status='queued',last_error=NULL,created_at=now() WHERE workspace_reminder_deliveries.status='failed' OR (workspace_reminder_deliveries.status='queued' AND workspace_reminder_deliveries.created_at < now()-interval '10 minutes') RETURNING id",
   [orgId,type,period]
  );
 }
@@ -22,7 +22,7 @@ async function claimReminder(table:'reminder_deliveries'|'workspace_reminder_del
 async function runReminders(){
  const period=periodKey();
  const organizations=await query<DueOrganization>(
-  "SELECT DISTINCT o.organization_id, org.name FROM objectives o JOIN organizations org ON org.id=o.organization_id WHERE o.status <> 'complete'"
+  "SELECT DISTINCT o.organization_id, org.name FROM objectives o JOIN organizations org ON org.id=o.organization_id JOIN integrations i ON i.organization_id=org.id AND i.enabled=true WHERE o.status <> 'complete'"
  );
  for(const org of organizations.rows){
   const claim=await claimReminder('workspace_reminder_deliveries',org.organization_id,null,'weekly_workspace_checkin',period);
