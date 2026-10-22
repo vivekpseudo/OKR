@@ -1,4 +1,4 @@
-name: Validate MVP
+name: Validate MVP and production backend
 
 on:
   push:
@@ -10,8 +10,8 @@ permissions:
   contents: read
 
 jobs:
-  syntax:
-    name: Validate browser JavaScript
+  frontend:
+    name: Validate prototype JavaScript
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -22,3 +22,23 @@ jobs:
           node-version: 22
       - name: Check application syntax
         run: node --check app.js
+
+  backend:
+    name: Build production API
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - name: Install dependencies
+        run: npm install
+      - name: Compile TypeScript
+        run: npm run build
