@@ -14,6 +14,7 @@ services:
     environment:
       DATABASE_URL: postgresql://okr:${POSTGRES_PASSWORD:-okr_local_only}@db:5432/okr
     ports: ["3001:3001"]
+    extra_hosts: ["host.docker.internal:host-gateway"]
     depends_on: {db: {condition: service_healthy}}
     restart: unless-stopped
   reminder-worker:
@@ -23,6 +24,7 @@ services:
     environment:
       RUN_REMINDER_WORKER: "true"
       DATABASE_URL: postgresql://okr:${POSTGRES_PASSWORD:-okr_local_only}@db:5432/okr
+    extra_hosts: ["host.docker.internal:host-gateway"]
     depends_on: {db: {condition: service_healthy}}
     restart: unless-stopped
 volumes:
