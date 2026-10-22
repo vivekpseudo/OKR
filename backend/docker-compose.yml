@@ -1,0 +1,29 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: okr
+      POSTGRES_USER: okr
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-okr_local_only}
+    ports: ["5433:5432"]
+    volumes: ["okr_pgdata:/var/lib/postgresql/data","./migrations:/docker-entrypoint-initdb.d:ro"]
+    healthcheck: {test: ["CMD-SHELL","pg_isready -U okr -d okr"],interval: 5s,timeout: 3s,retries: 10}
+  api:
+    build: .
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://okr:${POSTGRES_PASSWORD:-okr_local_only}@db:5432/okr
+    ports: ["3001:3001"]
+    depends_on: {db: {condition: service_healthy}}
+    restart: unless-stopped
+  reminder-worker:
+    build: .
+    command: ["node","dist/worker.js"]
+    env_file: .env
+    environment:
+      RUN_REMINDER_WORKER: "true"
+      DATABASE_URL: postgresql://okr:${POSTGRES_PASSWORD:-okr_local_only}@db:5432/okr
+    depends_on: {db: {condition: service_healthy}}
+    restart: unless-stopped
+volumes:
+  okr_pgdata:
