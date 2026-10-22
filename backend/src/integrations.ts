@@ -21,7 +21,8 @@ async function deliver(provider: Provider, secret: string, destination: string |
       method: 'POST',
       headers: { authorization: 'Bearer ' + secret, 'content-type': 'application/json; charset=utf-8' },
       body: JSON.stringify({ channel: destination, text: message, unfurl_links: false, unfurl_media: false }),
-      signal: AbortSignal.timeout(8000)
+      signal: AbortSignal.timeout(8000),
+      redirect: 'error'
     });
     const data = await response.json() as { ok?: boolean; error?: string };
     if (!response.ok || !data.ok) throw new Error('Slack delivery failed: ' + (data.error ?? response.status));
