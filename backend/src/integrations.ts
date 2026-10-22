@@ -2,7 +2,7 @@ import { decryptSecret } from './security.js';
 import { query } from './db.js';
 
 type Provider = 'slack' | 'teams';
-type Integration = { provider: Provider; encrypted_secret: string; destination: string | null };
+type Integration = { provider: Provider; encrypted_secret: string; destination: string | null; [column: string]: any };
 
 function isAllowedTeamsWebhook(value: string) {
   let u: URL;
