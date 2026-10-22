@@ -7,7 +7,6 @@ import {z} from 'zod';
 import {env} from './config.js';
 import {pool,query} from './db.js';
 import {authenticate,requireAdmin,hashPassword,verifyPassword,signAccessToken,encryptSecret,decryptSecret} from './security.js';
-import {sendNotificationEvent} from './notifications.js';
 import {sendIntegrationMessage} from './integrations.js';
 const app=Fastify({logger:true,bodyLimit:1024*1024});
 await app.register(helmet);
