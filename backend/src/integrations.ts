@@ -53,7 +53,7 @@ export async function sendWorkspaceIntegrationMessages(organizationId: string, m
     try {
       await sendIntegrationMessage(integration.provider, decryptSecret(integration.encrypted_secret), integration.destination, message);
     } catch (error) {
-      failures.push(integration.provider + ': ' + (error instanceof Error ? error.message : 'delivery failed'));
+      failures.push(integration.provider + ': delivery failed (' + (error instanceof Error ? error.name : 'unknown error') + ')');
     }
   }
   if (failures.length) throw new Error(failures.join('; ').slice(0, 500));
