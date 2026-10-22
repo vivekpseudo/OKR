@@ -1,0 +1,56 @@
+name: OKR backend CI
+
+on:
+  push:
+    branches: [main]
+    paths: ['backend/**', '.github/workflows/backend-ci.yml']
+  pull_request:
+    paths: ['backend/**', '.github/workflows/backend-ci.yml']
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package.json
+      - run: npm install
+      - run: npm run build
+      - run: node --test
+  schema:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: okr
+          POSTGRES_USER: okr
+          POSTGRES_PASSWORD: ci-password
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U okr -d okr"
+          --health-interval 5s --health-timeout 3s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: sudo apt-get update && sudo apt-get install -y postgresql-client
+      - name: Apply initial schema
+        env:
+          PGPASSWORD: ci-password
+        run: psql -h localhost -U okr -d okr -v ON_ERROR_STOP=1 -f backend/migrations/001_initial.sql
+      - name: Apply incremental migration
+        env:
+          PGPASSWORD: ci-password
+        run: psql -h localhost -U okr -d okr -v ON_ERROR_STOP=1 -f backend/migrations/002_workspace_reminders.sql
