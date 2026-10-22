@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f7f8fc" />
+  <meta name="description" content="A simpler weekly OKR ritual for ambitious small teams." />
+  <title>Compass — OKR workspace</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="#overview" aria-label="Compass home"><span class="brand-mark">✳</span><span>compass<span class="brand-dot">.</span><small>GOALS THAT MOVE YOU</small></span></a>
+      <div class="workspace-switch"><span class="workspace-avatar">N</span><span><b>Northstar Studio</b><small>Free workspace</small></span><span class="chevron">⌄</span></div>
+      <p class="nav-label">WORKSPACE</p>
+      <nav class="primary-nav" aria-label="Main navigation">
+        <button class="nav-item active" data-view="overview"><span>◫</span> Overview</button>
+        <button class="nav-item" data-view="objectives"><span>◎</span> Objectives <span class="nav-count" id="objective-count">6</span></button>
+        <button class="nav-item" data-view="alignment"><span>⌘</span> Alignment</button>
+        <button class="nav-item" data-view="checkins"><span>↻</span> Check-ins <span class="nav-ping"></span></button>
+        <button class="nav-item" data-view="people"><span>♙</span> People</button>
+        <button class="nav-item" data-view="reports"><span>▥</span> Reports</button>
+      </nav>
+      <div class="sidebar-bottom"><div class="cycle-card"><div class="cycle-icon">◷</div><div><b>Q4 · 2026</b><small>Quarterly cycle</small></div><button aria-label="Cycle options" class="icon-button">···</button><div class="cycle-progress"><span></span></div><small>23 days remaining</small></div><button class="help-link"><span>?</span> Help & feedback</button><div class="profile"><div class="avatar avatar-purple">VK</div><div><b>Vivek Kushwaha</b><small>Workspace admin</small></div><button class="icon-button" aria-label="Profile options">···</button></div></div>
+    </aside>
+    <main class="main-area">
+      <header class="topbar"><button class="mobile-menu" id="mobile-menu" aria-label="Toggle menu">☰</button><div class="breadcrumbs">Northstar Studio <span>/</span> <b id="breadcrumb-current">Overview</b></div><div class="topbar-actions"><span class="cycle-pill"><span></span> Q4 · 2026</span><button class="icon-button notification-button" aria-label="Notifications">♧<i></i></button><div class="avatar avatar-purple top-avatar">VK</div></div></header>
+      <section class="content" id="view-root" aria-live="polite"></section>
+      <footer class="footer"><span>Made for teams that do the work.</span><span>Compass <b>·</b> Keep moving forward ↗</span></footer>
+    </main>
+  </div>
+  <dialog id="objective-dialog" class="modal"><form id="objective-form" method="dialog"><div class="modal-heading"><div><p class="eyebrow">NEW GOAL</p><h2>Create an objective</h2><p class="muted">Make the outcome clear. Progress comes next.</p></div><button type="button" class="icon-button" data-close="objective-dialog" aria-label="Close">✕</button></div><label>Objective name<input name="title" required maxlength="140" placeholder="e.g. Become the go-to partner for our clients" /></label><label>Owner<select name="owner" id="objective-owner" required></select></label><div class="form-row"><label>Team<select name="team"><option>Growth</option><option>Product</option><option>Customer success</option><option>Operations</option></select></label><label>Due date<input name="due" type="date" value="2026-12-31" required /></label></div><label>Why does this matter?<textarea name="description" rows="3" maxlength="400" placeholder="Describe the impact this objective should create."></textarea></label><div class="modal-actions"><button type="button" class="button button-quiet" data-close="objective-dialog">Cancel</button><button type="submit" class="button button-primary">Create objective <span>↗</span></button></div></form></dialog>
+  <dialog id="keyresult-dialog" class="modal"><form id="keyresult-form" method="dialog"><div class="modal-heading"><div><p class="eyebrow">MEASURE WHAT MATTERS</p><h2>Add a key result</h2><p class="muted">A good key result is measurable and time-bound.</p></div><button type="button" class="icon-button" data-close="keyresult-dialog" aria-label="Close">✕</button></div><label>Key result<input name="title" required maxlength="140" placeholder="e.g. Increase activation to 65%" /></label><label>Parent objective<select name="objective" id="keyresult-objective" required></select></label><div class="form-row"><label>Metric type<select name="metric"><option value="percent">Percentage (%)</option><option value="number">Number</option><option value="currency">Currency ($)</option></select></label><label>Target value<input name="target" type="number" min="1" step="any" value="100" required /></label></div><label>Owner<select name="owner" id="keyresult-owner" required></select></label><div class="modal-actions"><button type="button" class="button button-quiet" data-close="keyresult-dialog">Cancel</button><button type="submit" class="button button-primary">Add key result <span>↗</span></button></div></form></dialog>
+  <dialog id="checkin-dialog" class="modal"><form id="checkin-form" method="dialog"><div class="modal-heading"><div><p class="eyebrow">WEEKLY RHYTHM</p><h2>Update your progress</h2><p class="muted">Small updates make meaningful progress visible.</p></div><button type="button" class="icon-button" data-close="checkin-dialog" aria-label="Close">✕</button></div><label>Key result<select name="keyresult" id="checkin-keyresult" required></select></label><label>Current value<input name="value" type="number" min="0" step="any" required /></label><label>What changed this week?<textarea name="note" rows="4" maxlength="500" placeholder="Share a win, a blocker, or your next step." required></textarea></label><div class="modal-actions"><button type="button" class="button button-quiet" data-close="checkin-dialog">Cancel</button><button type="submit" class="button button-primary">Save check-in <span>↗</span></button></div></form></dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
